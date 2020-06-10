@@ -47,10 +47,7 @@ var interfaceConfig = {
      * jwt.
      */
     TOOLBAR_BUTTONS: [
-        'camera', 'closedcaptions', 'fullscreen',
-        'fodeviceselection', 'hangup', 'profile', 'info', 'chat', 'recording',
-        'etherpad', 'settings', 'filmstrip', 'feedback',
-        'tileview' , 'download', 'help',
+        'camera', 'closedcaptions', 'fodeviceselection', 'hangup', 'profile', 'info', 'chat', 'etherpad', 'settings' , 'download', 'help',
     ],
 
     SETTINGS_SECTIONS: [ 'devices', 'language', 'moderator', 'profile', 'calendar' ],
@@ -198,7 +195,7 @@ var interfaceConfig = {
     /**
      * If true, notifications regarding joining/leaving are no longer displayed.
      */
-    DISABLE_JOIN_LEAVE_NOTIFICATIONS: false,
+    DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
 
     /**
     * Decides whether the chrome extension banner should be rendered on the landing page and during the meeting.
