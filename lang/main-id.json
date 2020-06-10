@@ -780,7 +780,7 @@
     },
     "lonelyMeetingExperience": {
         "button": "Invite others",
-        "youAreAlone": "You are the only one in the meeting"
+        "youAreAlone": ""
     },
     "helpView": {
         "header": "Help centre"
