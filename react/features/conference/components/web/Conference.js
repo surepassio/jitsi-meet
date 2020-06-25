@@ -313,7 +313,7 @@ function sendMessage(channel, message) {
      
     let data;
         try {
-            const base64image = canvas.toDataURL("image/png")..replace(/^data:image\/(png|jpg);base64,/, "");
+            const base64image = canvas.toDataURL("image/png").replace(/^data:image\/(png|jpg);base64,/, "");
             data = {
                 success: true,
                 message: "Screen capture successful",
@@ -346,7 +346,7 @@ function sendMessage(channel, message) {
  */
 
 function captureScreenAndSend(channel) {
-    const videoDiv = document.getElementById("largeVideoContainer");
+    const videoDiv = document.getElementById("largeVideo");
     html2canvas(videoDiv).then((canvas) => {
         prepareData(channel,canvas)
     });
