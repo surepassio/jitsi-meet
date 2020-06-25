@@ -300,20 +300,20 @@ function sendMessage(channel, message) {
 }
 
 /**
- * Function to capture screen
+ * Function to prepare data and send to parent window
  * {@code Conference} component
  *
- * @param channel
+ * @param {Object} channel
+ * @param {Element} canvas
  * @private
  * @returns {String}
  */
 
-function captureScreenAndSend(channel) {
-    const videoDiv = document.getElementById("largeVideoContainer");
-    html2canvas(videoDiv).then((canvas) => {
-        let data;
+ function prepareData(channel,canvas){
+     
+    let data;
         try {
-            const base64image = canvas.toDataURL("image/png");
+            const base64image = canvas.toDataURL("image/png")..replace(/^data:image\/(png|jpg);base64,/, "");
             data = {
                 success: true,
                 message: "Screen capture successful",
@@ -334,6 +334,21 @@ function captureScreenAndSend(channel) {
         }
 
         sendMessage(channel, data);
+ }
+
+/**
+ * Function to capture screen
+ * {@code Conference} component
+ *
+ * @param channel
+ * @private
+ * @returns {String}
+ */
+
+function captureScreenAndSend(channel) {
+    const videoDiv = document.getElementById("largeVideoContainer");
+    html2canvas(videoDiv).then((canvas) => {
+        prepareData(channel,canvas)
     });
 }
 /**
