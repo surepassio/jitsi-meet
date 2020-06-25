@@ -2,6 +2,8 @@
 
 import _ from "lodash";
 import React from "react";
+import postis from "postis";
+import html2canvas from "html2canvas";
 
 import VideoLayout from "../../../../../modules/UI/videolayout/VideoLayout";
 import { getConferenceNameForTitle } from "../../../base/conference";
@@ -132,6 +134,22 @@ class Conference extends AbstractConference<Props, *> {
     componentDidMount() {
         document.title = `${this.props._roomName} | ${interfaceConfig.APP_NAME}`;
         this._start();
+
+        const targetWindow = window.parent;
+        let parentWindowMessage;
+
+        const channel = postis({
+            window: targetWindow,
+            scope: "Screen Capture",
+        });
+
+        channel.ready(function () {
+            channel.listen("remoteMessageFromParent", function (remoteMessage) {
+                if (remoteMessage.command === "CAPTURE SCREEN") {
+                    captureScreenAndSend(channel);
+                }
+            });
+        });
     }
     /**
      * Calls into legacy UI to update the application layout, if necessary.
@@ -264,6 +282,60 @@ class Conference extends AbstractConference<Props, *> {
     }
 }
 
+/**
+ * Function to send message to parent window
+ * {@code Conference} component
+ *
+ * @param {Object} channel
+ * @param {Object} message
+ * @private
+ * @returns {String}
+ */
+
+function sendMessage(channel, message) {
+    channel.send({
+        method: "remoteMessageFromChild",
+        params: { msg: { ...message }, from: "child iframe" },
+    });
+}
+
+/**
+ * Function to capture screen
+ * {@code Conference} component
+ *
+ * @param channel
+ * @private
+ * @returns {String}
+ */
+
+function captureScreenAndSend(channel) {
+    const videoDiv = document.getElementById("largeVideoContainer");
+    html2canvas(videoDiv).then((canvas) => {
+        let data;
+        try {
+            const base64image = canvas.toDataURL("image/png");
+            data = {
+                success: true,
+                message: "Screen capture successful",
+                status_code: 200,
+                data: {
+                    image: base64image,
+                },
+            };
+        } catch (e) {
+            data = {
+                success: false,
+                message: "Screen capture unsuccessful",
+                status_code: 400,
+                data: {
+                    image: "",
+                },
+            };
+        }
+
+        sendMessage(channel, data);
+    });
+}
 /**
  * Maps (parts of) the Redux state to the associated props for the
  * {@code Conference} component.
