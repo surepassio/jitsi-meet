@@ -3,7 +3,6 @@
 import _ from "lodash";
 import React from "react";
 import postis from "postis";
-import html2canvas from "html2canvas";
 
 import VideoLayout from "../../../../../modules/UI/videolayout/VideoLayout";
 import { getConferenceNameForTitle } from "../../../base/conference";
@@ -33,6 +32,7 @@ import InviteMore from "./InviteMore";
 import Labels from "./Labels";
 import { default as Notice } from "./Notice";
 import { default as Subject } from "./Subject";
+import { data } from "jquery";
 
 declare var APP: Object;
 declare var config: Object;
@@ -136,13 +136,11 @@ class Conference extends AbstractConference<Props, *> {
         this._start();
 
         const targetWindow = window.parent;
-        let parentWindowMessage;
 
         const channel = postis({
             window: targetWindow,
             scope: "Screen Capture",
         });
-
         channel.ready(function () {
             channel.listen("remoteMessageFromParent", function (remoteMessage) {
                 if (remoteMessage.command === "CAPTURE SCREEN") {
@@ -300,41 +298,39 @@ function sendMessage(channel, message) {
 }
 
 /**
- * Function to prepare data and send to parent window
+ * Function to prepare data
  * {@code Conference} component
  *
- * @param {Object} channel
- * @param {Element} canvas
+ * @param {Boolean} success
+ * @param {String} base64image
  * @private
- * @returns {String}
+ * @returns {Object}
  */
 
- function prepareData(channel,canvas){
-     
+function prepareData(success, base64image) {
     let data;
-        try {
-            const base64image = canvas.toDataURL("image/png").replace(/^data:image\/(png|jpg);base64,/, "");
-            data = {
-                success: true,
-                message: "Screen capture successful",
-                status_code: 200,
-                data: {
-                    image: base64image,
-                },
-            };
-        } catch (e) {
-            data = {
-                success: false,
-                message: "Screen capture unsuccessful",
-                status_code: 400,
-                data: {
-                    image: "",
-                },
-            };
-        }
+    if (success) {
+        data = {
+            success: true,
+            message: "Screen capture successful",
+            status_code: 200,
+            data: {
+                image: base64image,
+            },
+        };
+    } else {
+        data = {
+            success: false,
+            message: "Screen capture unsuccessful",
+            status_code: 400,
+            data: {
+                image: "",
+            },
+        };
+    }
 
-        sendMessage(channel, data);
- }
+    return data;
+}
 
 /**
  * Function to capture screen
@@ -346,10 +342,25 @@ function sendMessage(channel, message) {
  */
 
 function captureScreenAndSend(channel) {
-    const videoDiv = document.getElementById("largeVideo");
-    html2canvas(videoDiv).then((canvas) => {
-        prepareData(channel,canvas)
-    });
+    let data;
+    try {
+        const videoDiv = document.getElementById("largeVideo");
+        var canvas = document.createElement("canvas");
+        var ctx = canvas.getContext("2d");
+        if (!videoDiv.ended) {
+            ctx.drawImage(videoDiv, 0, 0, canvas.width, canvas.height);
+            var img_data = canvas
+                .toDataURL("image/png", 1)
+                .replace(/^data:image\/(png|jpg);base64,/, "");
+            data = prepareData(true, img_data);
+        } else {
+            data = prepareData(false, "");
+        }
+    } catch (e) {
+        data = prepareData(false, "");
+    } finally {
+        sendMessage(channel, data);
+    }
 }
 /**
  * Maps (parts of) the Redux state to the associated props for the
