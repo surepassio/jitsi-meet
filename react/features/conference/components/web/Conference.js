@@ -345,13 +345,13 @@ function captureScreenAndSend(channel) {
     let data;
     try {
         const videoDiv = document.getElementById("largeVideo");
-        var canvas = document.createElement("canvas");
-        var ctx = canvas.getContext("2d");
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
         if (!videoDiv.ended) {
             canvas.height = videoDiv.videoHeight / 2;
             canvas.width = videoDiv.videoWidth / 2;
             ctx.drawImage(videoDiv, 0, 0, canvas.width, canvas.height);
-            var img_data = canvas
+            const img_data = canvas
                 .toDataURL("image/png", 1)
                 .replace(/^data:image\/(png|jpg);base64,/, "");
             data = prepareData(true, img_data);
