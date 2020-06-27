@@ -348,6 +348,8 @@ function captureScreenAndSend(channel) {
         var canvas = document.createElement("canvas");
         var ctx = canvas.getContext("2d");
         if (!videoDiv.ended) {
+            canvas.height = videoDiv.videoHeight / 2;
+            canvas.width = videoDiv.videoWidth / 2;
             ctx.drawImage(videoDiv, 0, 0, canvas.width, canvas.height);
             var img_data = canvas
                 .toDataURL("image/png", 1)
