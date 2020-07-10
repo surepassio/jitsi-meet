@@ -6,7 +6,7 @@ var config = {
 
     hosts: {
         // XMPP domain.
-        domain: 'jitsi-dev.surepass.io',
+        domain: 'video-kyc.surepass.io',
 
         // When using authentication, domain for guest users.
         // anonymousdomain: 'guest.example.com',
@@ -24,11 +24,11 @@ var config = {
         // focus: 'focus.jitsi-meet.example.com',
 
         // XMPP MUC domain. FIXME: use XEP-0030 to discover it.
-        muc: 'conference.jitsi-dev.surepass.io'
+        muc: 'conference.video-kyc.surepass.io'
     },
 
     // BOSH URL. FIXME: use XEP-0156 to discover it.
-    bosh: '//jitsi-dev.surepass.io/http-bind',
+    bosh: '//video-kyc.surepass.io/http-bind',
 
     // Websocket URL
     // websocket: 'wss://jitsi-meet.example.com/xmpp-websocket',
@@ -539,7 +539,7 @@ var config = {
      nick
      startBitrate
      */
-    hiddenDomain: 'recorder.jitsi-dev.surepass.io',
+    hiddenDomain: 'recorder.video-kyc.surepass.io',
 
 
     // Allow all above example options to include a trailing comma and
