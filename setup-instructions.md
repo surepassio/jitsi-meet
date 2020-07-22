@@ -14,3 +14,29 @@ prosodyctl register recorder recorder.jitsi.example.com Rec0rderP@ssw0rd
 ```
 
 and follow the rest of the guide for Jibri [here](https://github.com/surepassio/jibri-essentials/edit/master/README.md)
+
+
+### UFW Rules
+
+The following rules should be set up in UFW in order for Jitsi to work with Jibri and JVB
+
+```
+Status: active
+
+To                         Action      From
+--                         ------      ----
+80/tcp                     ALLOW       Anywhere                  
+443/tcp                    ALLOW       Anywhere                  
+4443/tcp                   ALLOW       Anywhere                  
+10000/udp                  ALLOW       Anywhere                  
+22/tcp                     ALLOW       Anywhere                  
+5222/tcp                   ALLOW       Anywhere                  
+10000:20000/udp            ALLOW       Anywhere                  
+80/tcp (v6)                ALLOW       Anywhere (v6)             
+443/tcp (v6)               ALLOW       Anywhere (v6)             
+4443/tcp (v6)              ALLOW       Anywhere (v6)             
+10000/udp (v6)             ALLOW       Anywhere (v6)             
+22/tcp (v6)                ALLOW       Anywhere (v6)             
+5222/tcp (v6)              ALLOW       Anywhere (v6)             
+10000:20000/udp (v6)       ALLOW       Anywhere (v6)   
+```
