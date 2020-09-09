@@ -15,28 +15,18 @@ import { CalleeInfoContainer } from "../../../invite";
 import { LargeVideo } from "../../../large-video";
 import { Prejoin, isPrejoinPageVisible } from "../../../prejoin";
 import {
-    Toolbox,
     fullScreenChanged,
     setToolboxAlwaysVisible,
     showToolbox,
 } from "../../../toolbox";
 import { LAYOUTS, getCurrentLayout } from "../../../video-layout";
 import { maybeShowSuboptimalExperienceNotification } from "../../functions";
-import VideoLayout from '../../../../../modules/UI/videolayout/VideoLayout';
-import { getConferenceNameForTitle } from '../../../base/conference';
-import { connect, disconnect } from '../../../base/connection';
-import { translate } from '../../../base/i18n';
-import { connect as reactReduxConnect } from '../../../base/redux';
-import { Chat } from '../../../chat';
-import { Filmstrip } from '../../../filmstrip';
-import { CalleeInfoContainer } from '../../../invite';
-import { LargeVideo } from '../../../large-video';
+
 import { KnockingParticipantList, LobbyScreen } from '../../../lobby';
-import { Prejoin, isPrejoinPageVisible } from '../../../prejoin';
+
 import { fullScreenChanged, setToolboxAlwaysVisible, showToolbox } from '../../../toolbox/actions.web';
 import { Toolbox } from '../../../toolbox/components/web';
-import { LAYOUTS, getCurrentLayout } from '../../../video-layout';
-import { maybeShowSuboptimalExperienceNotification } from '../../functions';
+
 import {
     AbstractConference,
     abstractMapStateToProps
