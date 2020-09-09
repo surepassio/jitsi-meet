@@ -15,20 +15,22 @@ import { FeedbackDialog } from '../feedback';
 import { setFilmstripEnabled } from '../filmstrip';
 import { setToolboxEnabled } from '../toolbox/actions';
 
-import { notifyKickedOut } from './actions';
+import { notifyKickedOut } from "./actions";
+import { getActiveSession } from "../recording";
+import { JitsiRecordingConstants } from "../base/lib-jitsi-meet";
 
-MiddlewareRegistry.register(store => next => action => {
+MiddlewareRegistry.register((store) => (next) => (action) => {
     const result = next(action);
 
     switch (action.type) {
-    case CONFERENCE_JOINED:
-    case SET_REDUCED_UI: {
-        const { dispatch, getState } = store;
-        const state = getState();
-        const { reducedUI } = state['features/base/responsive-ui'];
+        case CONFERENCE_JOINED:
+        case SET_REDUCED_UI: {
+            const { dispatch, getState } = store;
+            const state = getState();
+            const { reducedUI } = state["features/base/responsive-ui"];
 
-        dispatch(setToolboxEnabled(!reducedUI));
-        dispatch(setFilmstripEnabled(!reducedUI));
+            dispatch(setToolboxEnabled(!reducedUI));
+            dispatch(setFilmstripEnabled(!reducedUI));
 
         break;
     }
@@ -83,4 +85,33 @@ StateListenerRegistry.register(
             // We want to close all modals.
             dispatch(setActiveModalId());
         }
-    });
+    }
+);
+
+/**
+ * Check if the current conference is established and
+ * if recording is not started the start recording
+ */
+StateListenerRegistry.register(
+    (state) => state["features/base/conference"],
+    (conferenceState, { getState }) => {
+        const state = getState();
+        const isRecordingRunning = Boolean(
+            getActiveSession(state,JitsiRecordingConstants.mode.FILE)
+        );
+        const conference = conferenceState.conference;
+        if (conference && !isRecordingRunning) {
+            const appData = JSON.stringify({
+                file_recording_metadata: {
+                    share: true,
+                },
+            });
+            const attributes = {};
+            attributes.type = "recording-service";
+            conference.startRecording({
+                mode: JitsiRecordingConstants.mode.FILE,
+                appData,
+            });
+        }
+    }
+);

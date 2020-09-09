@@ -1,8 +1,27 @@
 // @flow
 
-import _ from 'lodash';
-import React from 'react';
+import _ from "lodash";
+import React from "react";
+import postis from "postis";
 
+import VideoLayout from "../../../../../modules/UI/videolayout/VideoLayout";
+import { getConferenceNameForTitle } from "../../../base/conference";
+import { connect, disconnect } from "../../../base/connection";
+import { translate } from "../../../base/i18n";
+import { connect as reactReduxConnect } from "../../../base/redux";
+import { Chat } from "../../../chat";
+import { Filmstrip } from "../../../filmstrip";
+import { CalleeInfoContainer } from "../../../invite";
+import { LargeVideo } from "../../../large-video";
+import { Prejoin, isPrejoinPageVisible } from "../../../prejoin";
+import {
+    Toolbox,
+    fullScreenChanged,
+    setToolboxAlwaysVisible,
+    showToolbox,
+} from "../../../toolbox";
+import { LAYOUTS, getCurrentLayout } from "../../../video-layout";
+import { maybeShowSuboptimalExperienceNotification } from "../../functions";
 import VideoLayout from '../../../../../modules/UI/videolayout/VideoLayout';
 import { getConferenceNameForTitle } from '../../../base/conference';
 import { connect, disconnect } from '../../../base/connection';
@@ -26,6 +45,9 @@ import type { AbstractProps } from '../AbstractConference';
 
 import Labels from './Labels';
 import { default as Notice } from './Notice';
+import InviteMore from "./InviteMore";
+import { default as Subject } from "./Subject";
+import { data } from "jquery";
 
 declare var APP: Object;
 declare var config: Object;
@@ -39,9 +61,9 @@ declare var interfaceConfig: Object;
  * @type {Array<string>}
  */
 const FULL_SCREEN_EVENTS = [
-    'webkitfullscreenchange',
-    'mozfullscreenchange',
-    'fullscreenchange'
+    "webkitfullscreenchange",
+    "mozfullscreenchange",
+    "fullscreenchange",
 ];
 
 /**
@@ -52,16 +74,15 @@ const FULL_SCREEN_EVENTS = [
  * @type {Object}
  */
 const LAYOUT_CLASSNAMES = {
-    [LAYOUTS.HORIZONTAL_FILMSTRIP_VIEW]: 'horizontal-filmstrip',
-    [LAYOUTS.TILE_VIEW]: 'tile-view',
-    [LAYOUTS.VERTICAL_FILMSTRIP_VIEW]: 'vertical-filmstrip'
+    [LAYOUTS.HORIZONTAL_FILMSTRIP_VIEW]: "horizontal-filmstrip",
+    [LAYOUTS.TILE_VIEW]: "tile-view",
+    [LAYOUTS.VERTICAL_FILMSTRIP_VIEW]: "vertical-filmstrip",
 };
 
 /**
  * The type of the React {@code Component} props of {@link Conference}.
  */
 type Props = AbstractProps & {
-
     /**
      * Whether the local participant is recording the conference.
      */
@@ -89,8 +110,8 @@ type Props = AbstractProps & {
     _showPrejoin: boolean,
 
     dispatch: Function,
-    t: Function
-}
+    t: Function,
+};
 
 /**
  * The conference page of the Web application.
@@ -117,8 +138,9 @@ class Conference extends AbstractConference<Props, *> {
             100,
             {
                 leading: true,
-                trailing: false
-            });
+                trailing: false,
+            }
+        );
 
         // Bind event handler so it is only bound once for every instance.
         this._onFullScreenChange = this._onFullScreenChange.bind(this);
@@ -132,8 +154,21 @@ class Conference extends AbstractConference<Props, *> {
     componentDidMount() {
         document.title = `${this.props._roomName} | ${interfaceConfig.APP_NAME}`;
         this._start();
-    }
 
+        const targetWindow = window.parent;
+
+        const channel = postis({
+            window: targetWindow,
+            scope: "Screen Capture",
+        });
+        channel.ready(function () {
+            channel.listen("remoteMessageFromParent", function (remoteMessage) {
+                if (remoteMessage.command === "CAPTURE SCREEN") {
+                    captureScreenAndSend(channel);
+                }
+            });
+        });
+    }
     /**
      * Calls into legacy UI to update the application layout, if necessary.
      *
@@ -141,8 +176,10 @@ class Conference extends AbstractConference<Props, *> {
      * returns {void}
      */
     componentDidUpdate(prevProps) {
-        if (this.props._shouldDisplayTileView
-            === prevProps._shouldDisplayTileView) {
+        if (
+            this.props._shouldDisplayTileView ===
+            prevProps._shouldDisplayTileView
+        ) {
             return;
         }
 
@@ -162,8 +199,9 @@ class Conference extends AbstractConference<Props, *> {
     componentWillUnmount() {
         APP.UI.unbindEvents();
 
-        FULL_SCREEN_EVENTS.forEach(name =>
-            document.removeEventListener(name, this._onFullScreenChange));
+        FULL_SCREEN_EVENTS.forEach((name) =>
+            document.removeEventListener(name, this._onFullScreenChange)
+        );
 
         APP.conference.isJoined() && this.props.dispatch(disconnect());
     }
@@ -248,8 +286,9 @@ class Conference extends AbstractConference<Props, *> {
         APP.UI.registerListeners();
         APP.UI.bindEvents();
 
-        FULL_SCREEN_EVENTS.forEach(name =>
-            document.addEventListener(name, this._onFullScreenChange));
+        FULL_SCREEN_EVENTS.forEach((name) =>
+            document.addEventListener(name, this._onFullScreenChange)
+        );
 
         const { dispatch, t } = this.props;
 
@@ -257,11 +296,95 @@ class Conference extends AbstractConference<Props, *> {
 
         maybeShowSuboptimalExperienceNotification(dispatch, t);
 
-        interfaceConfig.filmStripOnly
-            && dispatch(setToolboxAlwaysVisible(true));
+        interfaceConfig.filmStripOnly &&
+            dispatch(setToolboxAlwaysVisible(true));
     }
 }
 
+/**
+ * Function to send message to parent window
+ * {@code Conference} component
+ *
+ * @param {Object} channel
+ * @param {Object} message
+ * @private
+ * @returns {String}
+ */
+
+function sendMessage(channel, message) {
+    channel.send({
+        method: "remoteMessageFromChild",
+        params: { msg: { ...message }, from: "child iframe" },
+    });
+}
+
+/**
+ * Function to prepare data
+ * {@code Conference} component
+ *
+ * @param {Boolean} success
+ * @param {String} base64image
+ * @private
+ * @returns {Object}
+ */
+
+function prepareData(success, base64image) {
+    let data;
+    if (success) {
+        data = {
+            success: true,
+            message: "Screen capture successful",
+            status_code: 200,
+            data: {
+                image: base64image,
+            },
+        };
+    } else {
+        data = {
+            success: false,
+            message: "Screen capture unsuccessful",
+            status_code: 400,
+            data: {
+                image: "",
+            },
+        };
+    }
+
+    return data;
+}
+
+/**
+ * Function to capture screen
+ * {@code Conference} component
+ *
+ * @param channel
+ * @private
+ * @returns {String}
+ */
+
+function captureScreenAndSend(channel) {
+    let data;
+    try {
+        const videoDiv = document.getElementById("largeVideo");
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        if (!videoDiv.ended) {
+            canvas.height = videoDiv.videoHeight / 2;
+            canvas.width = videoDiv.videoWidth / 2;
+            ctx.drawImage(videoDiv, 0, 0, canvas.width, canvas.height);
+            const img_data = canvas
+                .toDataURL("image/png", 1)
+                .replace(/^data:image\/(png|jpg);base64,/, "");
+            data = prepareData(true, img_data);
+        } else {
+            data = prepareData(false, "");
+        }
+    } catch (e) {
+        data = prepareData(false, "");
+    } finally {
+        sendMessage(channel, data);
+    }
+}
 /**
  * Maps (parts of) the Redux state to the associated props for the
  * {@code Conference} component.

@@ -134,6 +134,8 @@ class AbstractStartRecordingDialog extends Component<Props, State> {
             spaceLeft: undefined,
             selectedRecordingService
         };
+
+        
     }
 
     /**
@@ -146,6 +148,21 @@ class AbstractStartRecordingDialog extends Component<Props, State> {
         if (typeof this.props._token !== 'undefined') {
             this._onTokenUpdated();
         }
+        console.log("test2")
+
+        const appData = JSON.stringify({
+            'file_recording_metadata': {
+                'share': this.state.sharingEnabled
+            }
+        });
+        const attributes = {};
+        attributes.type = RECORDING_TYPES.JITSI_REC_SERVICE;
+
+        this.props._conference.startRecording({
+            mode: JitsiRecordingConstants.mode.FILE,
+            appData
+        });
+        console.log("test")
     }
 
     /**

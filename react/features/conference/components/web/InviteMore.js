@@ -50,20 +50,7 @@ function InviteMore({
     t
 }: Props) {
     return (
-        _visible
-            ? <div className = { `invite-more-container${_tileViewEnabled ? ' elevated' : ''}` }>
-                <div className = 'invite-more-header'>
-                    {t('addPeople.inviteMoreHeader')}
-                </div>
-                <div
-                    className = 'invite-more-button'
-                    onClick = { onClick }>
-                    <Icon src = { IconInviteMore } />
-                    <div className = 'invite-more-button-text'>
-                        {t('addPeople.inviteMorePrompt')}
-                    </div>
-                </div>
-            </div> : null
+        null
     );
 }
 
