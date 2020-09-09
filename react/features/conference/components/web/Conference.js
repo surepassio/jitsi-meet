@@ -14,11 +14,7 @@ import { Filmstrip } from "../../../filmstrip";
 import { CalleeInfoContainer } from "../../../invite";
 import { LargeVideo } from "../../../large-video";
 import { Prejoin, isPrejoinPageVisible } from "../../../prejoin";
-import {
-    fullScreenChanged,
-    setToolboxAlwaysVisible,
-    showToolbox,
-} from "../../../toolbox";
+
 import { LAYOUTS, getCurrentLayout } from "../../../video-layout";
 import { maybeShowSuboptimalExperienceNotification } from "../../functions";
 
