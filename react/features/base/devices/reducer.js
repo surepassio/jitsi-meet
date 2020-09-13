@@ -18,7 +18,6 @@ const DEFAULT_STATE = {
     },
     pendingRequests: []
 };
-
 /**
  * Listen for actions which changes the state of known and used devices.
  *

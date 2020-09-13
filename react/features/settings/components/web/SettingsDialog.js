@@ -137,7 +137,6 @@ function _mapStateToProps(state) {
     const showCalendarSettings
         = configuredTabs.includes('calendar') && isCalendarEnabled(state);
     const tabs = [];
-
     if (showDeviceSettings) {
         tabs.push({
             name: SETTINGS_TABS.DEVICES,

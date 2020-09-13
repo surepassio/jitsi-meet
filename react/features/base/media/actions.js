@@ -120,7 +120,6 @@ export function setVideoMuted(
         });
     };
 }
-
 /**
  * Creates an action to store the last video {@link Transform} applied to a
  * stream.

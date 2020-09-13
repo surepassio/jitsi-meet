@@ -46,6 +46,7 @@ function VideoSettingsPopup({
     setVideoInputDevice,
     videoDeviceIds
 }: Props) {
+    console.log("Settings")
     return (
         <div className = 'video-preview'>
             <InlineDialog

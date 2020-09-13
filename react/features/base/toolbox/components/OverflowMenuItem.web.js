@@ -104,7 +104,7 @@ class OverflowMenuItem extends Component<Props> {
             </li>
         );
     }
-
+    
     /**
      * Renders the text label to display in the {@code OverflowMenuItem}.
      *

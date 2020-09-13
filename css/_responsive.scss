@@ -6,6 +6,12 @@
 
     .new-toolbox {
         .toolbox-content {
+            justify-content: center;
+
+            .button-group-center{
+                width: 100%;
+            }
+
             .button-group-center, .button-group-left, .button-group-right {
                 .toolbox-button {
                     .toolbox-icon {
@@ -46,18 +52,19 @@
                 }
                 .toolbox-button {
                     .toolbox-icon {
-                        width: 18px;
-                        height: 18px;
+                        width: 3rem;
+                        height: 3rem;
+                        
                         svg {
-                            width: 12px;
-                            height: 12px;
+                            width: 2rem;
+                            height: 2rem;
                         }
                     }
 
                     &:nth-child(2) {
                         .toolbox-icon {
-                            width: 20px;
-                            height: 20px;
+                            width: 3rem;
+                            height: 3rem;
                         }
                     }
                 }

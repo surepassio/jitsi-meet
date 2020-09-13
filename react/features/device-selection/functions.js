@@ -143,7 +143,6 @@ export function processExternalDeviceRequest( // eslint-disable-line max-params
                 }));
             }
         });
-
         break;
     case 'getAvailableDevices':
         dispatch(getAvailableDevices()).then(devices => {

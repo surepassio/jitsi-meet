@@ -6,7 +6,6 @@ import React, { Component } from 'react';
 import { createToolbarEvent, sendAnalytics } from '../../../analytics';
 import { translate } from '../../../base/i18n';
 import { IconMenuThumb } from '../../../base/icons';
-
 import ToolbarButton from './ToolbarButton';
 
 /**
