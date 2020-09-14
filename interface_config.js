@@ -191,7 +191,7 @@ var interfaceConfig = {
      * - 'desktop' controls the "Share your screen" button
      */
     TOOLBAR_BUTTONS: [
-        'camera', 'closedcaptions', 'fodeviceselection', 'hangup', 'profile', 'info', 'chat', 'etherpad', 'settings' , 'download', 'help',
+        'camera', 'microphone','closedcaptions', 'fodeviceselection', 'hangup', 'profile', 'info', 'chat', 'etherpad', 'settings' , 'download', 'help',
     ],
 
     TOOLBAR_TIMEOUT: 4000,
