@@ -270,7 +270,7 @@ export function hasMoreThanOneAvailableDevices(state: Object, type: String) {
  * Returns another device of a specific type if there are more than one devices of a specific type.
  *
  * @param {Object} availableDevices - Available devices.
- * @param {string} type - The type of device: VideoOutput | audioOutput | audioInput | videoInput.
+ * @param {string} type - The type of device: videooutput | audiooutput | audioinput | videoinput.
  * @param {string} currentDeviceInUse - The current device in use.
  *
  * @returns {boolean}
@@ -278,10 +278,9 @@ export function hasMoreThanOneAvailableDevices(state: Object, type: String) {
 export function getAnotherDeviceId(availableDevices: Object, type: String, currentDeviceInUse: string) {
 
     return new Promise(function(resolve,reject){
-        const requestedTypeDevices = availableDevices[type]
-        const requiredDeviceNotInUse = requestedTypeDevices.find(
+        const requiredDeviceNotInUse = availableDevices.find(
             (device) =>
-            device.deviceId != currentDeviceInUse
+            device.kind === type && device.deviceId != currentDeviceInUse
         );
         if (requiredDeviceNotInUse && requiredDeviceNotInUse.deviceId) {
             resolve(requiredDeviceNotInUse.deviceId)

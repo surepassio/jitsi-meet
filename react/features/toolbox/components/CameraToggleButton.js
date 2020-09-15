@@ -5,7 +5,11 @@ import { translate } from "../../base/i18n";
 import { connect } from "../../base/redux";
 import { AbstractCameraToggleButton } from "../../base/toolbox/components";
 import type { AbstractButtonProps } from "../../base/toolbox/components";
-import { setVideoInputDevice, getAnotherDeviceId } from "../../base/devices";
+import {
+    setVideoInputDevice,
+    getAvailableDevices,
+    getAnotherDeviceId,
+} from "../../base/devices";
 import { getCurrentCameraDeviceId } from "../../base/settings";
 import Logger from "jitsi-meet-logger";
 const logger = Logger.getLogger(__filename);
@@ -42,20 +46,20 @@ class CameraToggleButton extends AbstractCameraToggleButton<Props, *> {
         super(props);
 
         this._cameraToggle = () => {
-            const {
-                _availableDevices,
-                _currentCameraDeviceId,
-                dispatch,
-            } = props;
-            getAnotherDeviceId(
-                _availableDevices,
-                "videoInput",
-                _currentCameraDeviceId
-            )
-                .then((deviceId) => dispatch(setVideoInputDevice(deviceId)))
-                .catch((error) =>
-                    logger.error("No other camera available", error)
-                );
+            const { _currentCameraDeviceId, dispatch } = props;
+            dispatch(getAvailableDevices()).then((_availableDevices) => {
+                logger.info("Available Devices",_availableDevices)
+                getAnotherDeviceId(
+                    _availableDevices,
+                    "videoinput",
+                    _currentCameraDeviceId
+                )
+                    .then((deviceId) => dispatch(setVideoInputDevice(deviceId)))
+                    .catch((error) =>
+                        logger.error("No other camera available", error)
+                    )
+                 } )
+                
         };
     }
     /**
@@ -71,9 +75,7 @@ class CameraToggleButton extends AbstractCameraToggleButton<Props, *> {
 }
 
 function _mapStateToProps(state) {
-    const { availableDevices } = state["features/base/devices"];
     return {
-        _availableDevices: availableDevices,
         _currentCameraDeviceId: getCurrentCameraDeviceId(state),
     };
 }
