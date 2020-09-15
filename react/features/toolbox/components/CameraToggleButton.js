@@ -5,11 +5,10 @@ import { translate } from "../../base/i18n";
 import { connect } from "../../base/redux";
 import { AbstractCameraToggleButton } from "../../base/toolbox/components";
 import type { AbstractButtonProps } from "../../base/toolbox/components";
-import { setVideoInputDevice } from "../../base/devices";
+import { setVideoInputDevice, getAnotherDeviceId } from "../../base/devices";
 import { getCurrentCameraDeviceId } from "../../base/settings";
-import Logger from 'jitsi-meet-logger';
+import Logger from "jitsi-meet-logger";
 const logger = Logger.getLogger(__filename);
-
 
 /**
  * The type of the React {@code Component} props of {@link CameraToggleButton}.
@@ -48,16 +47,15 @@ class CameraToggleButton extends AbstractCameraToggleButton<Props, *> {
                 _currentCameraDeviceId,
                 dispatch,
             } = props;
-            const { videoInput } = _availableDevices;
-            const cameraNotInUseAvailable = videoInput.find(
-                (videoDevices) =>
-                    videoDevices.deviceId != _currentCameraDeviceId
-            );
-            if (cameraNotInUseAvailable && cameraNotInUseAvailable.deviceId) {
-                dispatch(setVideoInputDevice(cameraNotInUseAvailable.deviceId));
-            }else{
-                logger.error("No other camera available");
-            }
+            getAnotherDeviceId(
+                _availableDevices,
+                "videoInput",
+                _currentCameraDeviceId
+            )
+                .then((deviceId) => dispatch(setVideoInputDevice(deviceId)))
+                .catch((error) =>
+                    logger.error("No other camera available", error)
+                );
         };
     }
     /**

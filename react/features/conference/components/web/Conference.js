@@ -18,19 +18,23 @@ import { Prejoin, isPrejoinPageVisible } from "../../../prejoin";
 import { LAYOUTS, getCurrentLayout } from "../../../video-layout";
 import { maybeShowSuboptimalExperienceNotification } from "../../functions";
 
-import { KnockingParticipantList, LobbyScreen } from '../../../lobby';
+import { KnockingParticipantList, LobbyScreen } from "../../../lobby";
 
-import { fullScreenChanged, setToolboxAlwaysVisible, showToolbox } from '../../../toolbox/actions.web';
-import { Toolbox } from '../../../toolbox/components/web';
+import {
+    fullScreenChanged,
+    setToolboxAlwaysVisible,
+    showToolbox,
+} from "../../../toolbox/actions.web";
+import { Toolbox } from "../../../toolbox/components/web";
 
 import {
     AbstractConference,
-    abstractMapStateToProps
-} from '../AbstractConference';
-import type { AbstractProps } from '../AbstractConference';
+    abstractMapStateToProps,
+} from "../AbstractConference";
+import type { AbstractProps } from "../AbstractConference";
 
-import Labels from './Labels';
-import { default as Notice } from './Notice';
+import Labels from "./Labels";
+import { default as Notice } from "./Notice";
 import InviteMore from "./InviteMore";
 import { default as Subject } from "./Subject";
 import { data } from "jquery";
@@ -202,38 +206,40 @@ class Conference extends AbstractConference<Props, *> {
         const {
             // XXX The character casing of the name filmStripOnly utilized by
             // interfaceConfig is obsolete but legacy support is required.
-            filmStripOnly: filmstripOnly
+            filmStripOnly: filmstripOnly,
         } = interfaceConfig;
         const {
             _iAmRecorder,
             _isLobbyScreenVisible,
             _layoutClassName,
-            _showPrejoin
+            _showPrejoin,
         } = this.props;
         const hideLabels = filmstripOnly || _iAmRecorder;
 
         return (
             <div
-                className = { _layoutClassName }
-                id = 'videoconference_page'
-                onMouseMove = { this._onShowToolbar }>
-
+                className={_layoutClassName}
+                id="videoconference_page"
+                onMouseMove={this._onShowToolbar}
+            >
                 <Notice />
-                <div id = 'videospace'>
+                <div id="videospace">
                     <LargeVideo />
                     <KnockingParticipantList />
-                    <Filmstrip filmstripOnly = { filmstripOnly } />
-                    { hideLabels || <Labels /> }
+                    <Filmstrip filmstripOnly={filmstripOnly} />
+                    {hideLabels || <Labels />}
                 </div>
 
-                { filmstripOnly || _showPrejoin || _isLobbyScreenVisible || <Toolbox /> }
-                { filmstripOnly || <Chat /> }
+                {filmstripOnly || _showPrejoin || _isLobbyScreenVisible || (
+                    <Toolbox />
+                )}
+                {filmstripOnly || <Chat />}
 
-                { this.renderNotificationsContainer() }
+                {this.renderNotificationsContainer()}
 
                 <CalleeInfoContainer />
 
-                { !filmstripOnly && _showPrejoin && <Prejoin />}
+                {!filmstripOnly && _showPrejoin && <Prejoin />}
             </div>
         );
     }
@@ -357,7 +363,12 @@ function captureScreenAndSend(channel) {
         if (!videoDiv.ended) {
             canvas.height = videoDiv.videoHeight / 2;
             canvas.width = videoDiv.videoWidth / 2;
+
+            // To translate the pixels of the image to overcome mirroring of image
+            // after capture through video element
             ctx.drawImage(videoDiv, 0, 0, canvas.width, canvas.height);
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
             const img_data = canvas
                 .toDataURL("image/png", 1)
                 .replace(/^data:image\/(png|jpg);base64,/, "");
@@ -382,11 +393,12 @@ function captureScreenAndSend(channel) {
 function _mapStateToProps(state) {
     return {
         ...abstractMapStateToProps(state),
-        _iAmRecorder: state['features/base/config'].iAmRecorder,
-        _isLobbyScreenVisible: state['features/base/dialog']?.component === LobbyScreen,
+        _iAmRecorder: state["features/base/config"].iAmRecorder,
+        _isLobbyScreenVisible:
+            state["features/base/dialog"]?.component === LobbyScreen,
         _layoutClassName: LAYOUT_CLASSNAMES[getCurrentLayout(state)],
         _roomName: getConferenceNameForTitle(state),
-        _showPrejoin: isPrejoinPageVisible(state)
+        _showPrejoin: isPrejoinPageVisible(state),
     };
 }
 

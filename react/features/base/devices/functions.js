@@ -5,6 +5,7 @@ import { updateSettings } from '../settings';
 import { parseURLParams } from '../util';
 
 import logger from './logger';
+import { reject } from 'lodash';
 
 declare var APP: Object;
 
@@ -248,6 +249,49 @@ export function hasAvailableDevices(state: Object, type: string) {
 
     return state['features/base/devices'].availableDevices[type].length > 0;
 }
+
+/**
+ * Returns true if there are more than one devices of a specific type or on native platform.
+ *
+ * @param {Object} state - The state of the application.
+ * @param {string} type - The type of device: VideoOutput | audioOutput | audioInput | videoInput.
+ *
+ * @returns {boolean}
+ */
+export function hasMoreThanOneAvailableDevices(state: Object, type: String) {
+    if (state['features/base/devices'] === undefined) {
+        return true;
+    }
+
+    return state['features/base/devices'].availableDevices[type].length > 1;
+}
+
+/**
+ * Returns another device of a specific type if there are more than one devices of a specific type.
+ *
+ * @param {Object} availableDevices - Available devices.
+ * @param {string} type - The type of device: VideoOutput | audioOutput | audioInput | videoInput.
+ * @param {string} currentDeviceInUse - The current device in use.
+ *
+ * @returns {boolean}
+ */
+export function getAnotherDeviceId(availableDevices: Object, type: String, currentDeviceInUse: string) {
+
+    return new Promise(function(resolve,reject){
+        const requestedTypeDevices = availableDevices[type]
+        const requiredDeviceNotInUse = requestedTypeDevices.find(
+            (device) =>
+            device.deviceId != currentDeviceInUse
+        );
+        if (requiredDeviceNotInUse && requiredDeviceNotInUse.deviceId) {
+            resolve(requiredDeviceNotInUse.deviceId)
+        }else{
+            reject(new Error("No other device available"))
+        }
+    })
+    
+}
+
 
 /**
  * Set device id of the audio output device which is currently in use.

@@ -240,6 +240,8 @@
 #largeVideoWrapper>object,
 .videocontainer>video,
 .videocontainer>object {
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
     position: absolute;
     left: 0;
     top: 0;
